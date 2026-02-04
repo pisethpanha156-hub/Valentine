@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Love Question</title>
+<style>
+body {
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  background: #111; /* initial plain background */
+  color: white;
+  transition: background 0.5s;
+}
+
+h1 {
+  font-size: 38px;
+  text-align: center;
+  text-shadow:
+    0 0 5px #ff4d6d,
+    0 0 10px #ff4d6d,
+    0 0 20px #ff4d6d,
+    0 0 40px #ff1a40;
+}
+
+main {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.btn-container {
+  margin-top: 20px;
+  position: relative;
+  height: 200px;
+}
+
+button {
+  padding: 10px 25px;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  position: absolute;
+}
+
+.yes { background: #ff4d6d; color: white; left: 60px; }
+.no { background: #555; color: white; left: 160px; }
+
+.credit {
+  position: fixed;
+  bottom: 10px;
+  right: 15px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="music" loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="fireworks"></canvas>
+
+<main>
+  <h1 id="title">Will you be my Valentine? 💘</h1>
+  <div class="btn-container" id="buttons">
+    <button class="yes" onclick="yesClicked()">Yes</button>
+    <button class="no" onclick="moveNo()">No</button>
+  </div>
+</main>
+
+<div class="credit">Created by Nham</div>
+
+<script>
+function yesClicked() {
+  // Change text
+  document.getElementById("title").innerText =
+    "You're my valentine now. I love you Liza 💕";
+
+  // Hide buttons
+  document.getElementById("buttons").style.display = "none";
+
+  // Set GIF background
+  document.body.style.background = "url('background.gif') no-repeat center center/cover";
+
+  // Play music
+  const music = document.getElementById("music");
+  music.play();
+
+  // Vibration
+  if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
+
+  // Trigger celebrations
+  heartBurst();
+  startFireworks();
+}
+
+function moveNo() {
+  const btn = document.querySelector(".no");
+  btn.style.top = Math.random() * 150 + "px";
+  btn.style.left = Math.random() * 200 + "px";
+}
+
+// Heart explosion
+function heartBurst() {
+  for (let i = 0; i < 40; i++) {
+    const heart = document.createElement("div");
+    heart.innerText = "❤";
+    heart.style.position = "fixed";
+    heart.style.left = "50%";
+    heart.style.top = "50%";
+    heart.style.fontSize = "24px";
+    heart.style.color = "#ff4d6d";
+    heart.style.pointerEvents = "none";
+
+    const angle = Math.random() * 2 * Math.PI;
+    const distance = 150 + Math.random() * 150;
+
+    heart.animate([
+      { transform: "translate(-50%, -50%) scale(1)", opacity: 1 },
+      {
+        transform: `translate(${Math.cos(angle)*distance}px, ${Math.sin(angle)*distance}px) scale(0.5)`,
+        opacity: 0
+      }
+    ], { duration: 1200, easing: "ease-out" });
+
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 1200);
+  }
+}
+
+// Fireworks
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+let fireworksStarted = false;
+
+function startFireworks() {
+  if (fireworksStarted) return;
+  fireworksStarted = true;
+
+  setInterval(() => explode(), 500);
+  animateFireworks();
+}
+
+function explode() {
+  const x = Math.random() * canvas.width;
+  const y = Math.random() * canvas.height / 2;
+
+  for (let i = 0; i < 40; i++) {
+    particles.push({
+      x, y,
+      dx: (Math.random() - 0.5) * 6,
+      dy: (Math.random() - 0.5) * 6,
+      life: 60
+    });
+  }
+}
+
+function animateFireworks() {
+  ctx.fillStyle = "rgba(0,0,0,0.2)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  particles.forEach(p => {
+    ctx.fillStyle = "#ff4d6d";
+    ctx.fillRect(p.x, p.y, 3, 3);
+    p.x += p.dx;
+    p.y += p.dy;
+    p.life--;
+  });
+
+  particles = particles.filter(p => p.life > 0);
+  requestAnimationFrame(animateFireworks);
+}
+</script>
+
+</body>
+</html>
